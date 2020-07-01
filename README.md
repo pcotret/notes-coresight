@@ -1,1 +1,1 @@
-# notes-coresight
+# Notes sur la manipulation des composants Coresight
