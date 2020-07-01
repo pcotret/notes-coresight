@@ -1,0 +1,137 @@
+%===================================================%
+%===================================================%
+\chapter{Preparing SD card}
+%===================================================%
+%===================================================%
+
+\textbf{Sources:}\\
+\texttt{ZedBoard Documentation :}\\
+\framebox{\url{http://architechboards-zedboard.readthedocs.org/en/latest/board.html}}\\ \vspace{5pt}
+
+\framebox{\url{http://zedboard.org/sites/default/files/documentations/GS-AES-Z7EV-7Z020-G-V7.pdf}}\\ \vspace{5pt}
+
+\framebox{\url{http://zedboard.org/sites/default/files/GS-AES-Z7EV-7Z020-G-14.1-V5.pdf}}\\ \vspace{5pt}
+
+\framebox{\url{http://zedboard.org/sites/default/files/ZedBoard_HW_UG_v1_1.pdf}}\\ \vspace{5pt}
+
+%===================================================%
+\section{Prepare boot image}
+%===================================================%
+\label{sec:prepate_boot_image}
+\framebox{\url{http://www.wiki.xilinx.com/Prepare+Boot+Image}}.\\
+
+Put the following files in a folder
+\begin{itemize}[label=$\bullet$]
+\item \texttt{executable.elf} (qui se trouve dans le dossier donné après le 'dir' de generate\_app (hsi))
+\item \texttt{u-boot.elf} (qui se trouve dans le dossier u-boot-xlnx et à renommer en u-boot.elf)
+Le reste des fichiers ce trouvent dans 'poky/build/tmp/deploy/images/zedboard-zynq7'
+\item \texttt{zedboard-zynq7.dtb}
+\item \texttt{core-image-minimal-zedboard-zynq7-<nombre>.rootfs.cpio.gz.u-boot} (que je conseil de renommer en 'core-image-minimal-zedboard-zynq7.rootfs.cpio.gz.u-boot')
+\item {uImage.bin} uImage'3.14-xilinx+git0+2b48a8aeea-r0-zedboard-zynq7-<nombre>.bin (qui est renommée en 'uImage.bin')
+\end{itemize}
+
+Create a boot.bif file with following :\\
+\begin{lstlisting}[language=bash]
+image: {
+[bootloader]executable.elf
+u-boot.elf
+optional_bitstream_file.bit
+[load=0x2a00000]zedboard-zynq7.dtb [load=0x2000000]core-image-minimal-zedboard-zynq7.rootfs.cpio.gz.u-boot
+[load=0x3000000]uImage.bin
+# currently bootgen requires a file extension. This is just a renamed uImage
+}
+\end{lstlisting}
+
+\textcolor{red}{Important note:}
+The parts where we load the device tree, rootFS and kernel uImage are optional and can be removed from the boot.bif. A simplified boot.bif looks like this : 
+
+\begin{lstlisting}[language=bash]
+image: {
+[bootloader]executable.elf
+u-boot.elf
+optional_bitstream_file.bit
+}
+\end{lstlisting}
+
+
+Run the following command
+\begin{lstlisting}[language=bash]
+$ bootgen -image boot.bif -o i boot.bin
+\end{lstlisting}
+
+Create \textbf{uEnv.txt} file with :
+\begin{lstlisting}[language=bash]
+bootcmd=fatload mmc 0 0x3000000 uImage.bin;
+fatload mmc 0 0x2A00000 zedboard-zynq7.dtb;
+fatload mmc 0 0x2000000 core-image-minimal-zedboard-zynq7.rootfs.cpio.gz.u-boot;
+bootm 0x3000000 0x2000000 0x2A00000
+uenvcmd=boot
+\end{lstlisting}
+
+\textcolor{red}{Important note:} The uEnv.txt file is very sensitive to spaces. An additional space somewhere and the u-boot won't be able to boot automatically. Therefore, use the working uEnv.txt files.
+
+%===================================================%
+\section{Copy files to SD Card}
+%===================================================%
+
+Copy the following files on the SD card:
+\begin{itemize}[label=$\bullet$]
+\item boot.bin
+\item core-image-minimal-zedboard-zynq7.rootfs.cpio.gz.u-boot
+\item uImage.bin
+\item zedboard-zynq7.dtb
+\item uEnv.txt
+\end{itemize}
+
+%===================================================%
+\section{Root FS on SD Card}
+%===================================================%
+The above mentionned procedure is if we want to use temporary file system (RootFS). It means that RootFS is stored in memory. The data can't be stored permanently. To store RootFS on SD card, we need to do the following : 
+
+\subsection{Boot.bin generation}
+
+Create a boot.bif file with following :\\
+\begin{lstlisting}[language=bash]
+image: {
+[bootloader]executable.elf
+u-boot.elf
+[load=0x2a00000]zedboard-zynq7.dtb
+[load=0x3000000]uImage.bin
+# currently bootgen requires a file extension. This is just a renamed uImage
+}
+\end{lstlisting}
+Run the following command
+\begin{lstlisting}[language=bash]
+$ bootgen -image boot.bif -o i boot.bin
+\end{lstlisting}
+
+\subsection{Prepare SD card}
+
+\begin{itemize}
+	\item Create two partitions on the SD Card (\footnote{Follow the steps on following link e.g.  \url{http://www.qnx.com/developers/docs/660/index.jsp?topic=\%2Fcom.qnx.doc.bsp_update.guide\%2Ftopic\%2Fbsp\_660\_sd\_card\_ubuntu.html} }) \\(\textcolor{red}{Important note:} Follow this link (preferred one) or the one in footnote \url{http://www.wiki.xilinx.com/Prepare+Boot+Medium}).
+	\begin{itemize}
+		\item Partition 1: size = 1 GB, FAT32, Primary
+		\item Partition 2: size = 3 GB, EXT4, Secondary
+	\end{itemize}
+	\item Extract RootFS (core-image-full-cmdline-zedboard-zynq7.rootfs.tar.gz) on partition 2
+	\item Generate bin file using the following rootFS (core-image-full-cmdline-zedboard-zynq7.rootfs.tar.gz). Please follow the steps mentionned in \ref{sec:prepate_boot_image}	
+	\item Change the uEnv.txt to this 
+	\begin{lstlisting}[language=bash]
+	kernel_image=uImage.bin
+	devicetree_image=system.dtb
+	bootargs=console=ttyPS0,115200 
+	mem=384M memmap=128M$384M 
+	rootfstype=ext4 root=/dev/mmcblk0p2 rw 
+	rootwait earlyprintk
+	uenvcmd=echo Copying Linux from SD to RAM... 
+	&& fatload mmc 0 0x3000000 ${kernel_image} 
+	&& fatload mmc 0 0x2A00000 ${devicetree_image} 
+	&& bootm 0x3000000 - 0x2A00000
+	\end{lstlisting}
+	\item Copy the following files on partition 1 : 
+	\item zedboard-zynq7.dtb (Device tree)
+	\item Bin File
+	\item uEnv.txt
+	\item uImage.bin
+\end{itemize}
+ (\textcolor{red}{Important note:} Working boot files for Linux kernel v4.9 can be found under git redaction\_hw under work/boot/boot\_v4.9\_rootfs\_sd.zip)

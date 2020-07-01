@@ -1,0 +1,155 @@
+\documentclass[12pt,a4paper,svgnames]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[cyr]{aeguill}
+\usepackage{fancyhdr,url}
+%\pagestyle{fancy}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+\usepackage{color}
+\usepackage{xspace}
+%\usepackage[frenchb]{babel}
+%\makeatletter
+%\addto\extrasfrench{%s
+%   \providecommand{\og}{\leavevmode\flqq~}%
+%   \providecommand{\fg}{\ifdim\lastskip>\z@\unskip\fi~\frqq}%
+%}
+%
+%\makeatother
+\usepackage{array}
+\usepackage{verbatim}
+\usepackage{pifont}
+\usepackage{url}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage[numbers]{natbib}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=true,bookmarksopen=false,
+ breaklinks=false,pdfborder={0 0 0},backref=section,colorlinks=false]
+ {hyperref}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%\pdfpageheight\paperheight
+%\pdfpagewidth\paperwidth
+%
+%\DeclareRobustCommand{\greektext}{%
+%  \fontencoding{LGR}\selectfont\def\encodingdefault{LGR}}
+%\DeclareRobustCommand{\textgreek}[1]{\leavevmode{\greektext #1}}
+%\DeclareFontEncoding{LGR}{}{}
+%\DeclareTextSymbol{\~}{LGR}{126}
+%%% Because html converters don't know tabularnewline
+%\providecommand{\tabularnewline}{\\}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\usepackage{enumerate}
+\usepackage{mathtools}
+\usepackage{amsmath,amsfonts,amssymb}
+%\usepackage[numbered,framed]{mcode}
+\usepackage{graphicx,color,psfrag}
+\usepackage[x11names]{xcolor}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage[titletoc,toc,title]{appendix}
+\usepackage[french]{nomencl}
+\usepackage{geometry}
+\usepackage{amsthm}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{theorem}{Theorem}[section]
+\usepackage[explicit]{titlesec}
+\usepackage{nomencl}
+\usepackage{multirow}
+\usepackage{pdfpages}
+\usepackage{textcomp}
+\usepackage{url}
+\usepackage{booktabs}
+%\usepackage{geometry}
+\geometry{top = 2cm, bottom = 2cm, left = 2cm, right = 2cm}
+\usepackage{amssymb}
+
+\newcommand{\shellcmd}[1]{\\\indent\indent\texttt{\footnotesize\# #1}\\}
+
+%\usepackage{xcolor}
+\usepackage{listings}
+
+\lstdefinestyle{BashInputStyle}{
+  language=bash,
+  basicstyle=\small\sffamily,
+  numbers=left,
+  numberstyle=\tiny,
+  numbersep=3pt,
+  frame=tb,
+  columns=fullflexible,
+  backgroundcolor=\color{yellow!20},
+  linewidth=0.9\linewidth,
+  xleftmargin=0.1\linewidth
+}
+
+\newcommand*{\Package}[1]{\texttt{#1}}%
+\usepackage{enumitem}
+
+\makenomenclature
+
+\renewcommand{\appendixtocname}{Annexes}
+%\renewcommand{\appendixname}{Annexe}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\renewcommand*\contentsname{Sommaire}
+% \usepackage[nottoc, notlof, notlot]{tocbibind}
+\makenomenclature
+
+
+\pagenumbering{roman}
+%opening
+\title{\textbf{Developping Embedded Linux for ZedBoard using Yocto}}
+\author{Corentin Nouviale \\ Update : Muhammad Abdul WAHAB}
+\renewcommand{\labelitemii}{$\star$}
+
+\begin{document}
+\maketitle
+\pagebreak{}
+
+\tableofcontents{}
+
+\pagebreak{}
+
+\chapter*{Change log}
+
+\begin{table}
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lccl}
+\toprule
+\textbf{Author} & \textbf{Version} & \textbf{Date modified} & \textbf{Description of change}\\
+\midrule
+M.Abdul WAHAB & 1.0 & 11/12/2015 & Copied Corentin's tutorial in Latex \\
+M.Abdul WAHAB & 2.0 & 10/03/2016 & Added more information in almost every section \\
+M.Abdul WAHAB & 2.1 & 18/03/2016 & Added chapter \ref{chap:kernel_version} on kernel version modification \\
+M.Abdul WAHAB & 2.2 & 22/07/2016 & Added chapter \ref{chap:kernel_modifications} on how to modify kernel sources \\
+Mounir NASR ALLAH & 2.3 & 06/09/2016 & Added chapter \ref{chap:error}, correction of commands \\
+M.Abdul WAHAB & 2.4 & 06/09/2016 & Modified chapter \ref{chap:kernel_modifications} \\
+M.Abdul WAHAB & 2.5 & 08/09/2016 & Root FS on SD Card\\
+M.Abdul WAHAB & 2.6 & 09/12/2016 & Modified Root FS on SD Card section \\
+M.Abdul WAHAB & 2.7 & 10/12/2016 & Modified chapter on Linux kernel  modification (Added two subsections) \\
+M.Abdul WAHAB & 2.8 & 20/09/2017 & Modified chapter 3 (Preparing SD card) \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+\pagebreak
+\pagenumbering{arabic}
+\setcounter{page}{1}
+%\pagestyle{fancy}
+
+\input{introduction}
+\input{bootloader}
+\input{prepare_SD_card}
+\input{change_linux_kernel}
+\input{change_linux_source}
+\input{errors}
+
+
+\end{document}

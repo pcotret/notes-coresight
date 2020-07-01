@@ -1,0 +1,148 @@
+%===================================================%
+%===================================================%
+\chapter{Introduction}
+%===================================================%
+%===================================================%
+
+The following work is being done on Ubuntu 14.04 LTS 64-bit.
+The list of installed packages on the computer can be found at the following link. \framebox{\url{https://goo.gl/33UmDc}}.
+\\
+%%(\url{https://drive.google.com/open?id=0B1qotcVC6wOdOVVXcVRKcVBsd00})
+%same link than the previous one but a bit long (in case if the shortened URL does not work)
+
+To install the same packages on your VM or machine, you can use the following command :
+
+\begin{lstlisting}[language=bash]
+for pkg in $(cat install.list); do sudo apt-get -y install $pkg ; done
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash]
+sudo apt-get install aptitude && \
+sudo aptitude install $(cat install.list | awk '{print $1}')
+\end{lstlisting}
+
+(This may take a while !)\vspace{1em}
+
+\textbf{Interesting links  :}\vspace{1em}
+
+\textbf{Yocto configuration}
+
+
+\framebox{\url{http://picozed.org/content/building-zedboard-images}}.
+\vspace{1em}
+
+\textbf{meta-xilinx git}
+
+\framebox{\url{https://github.com/Xilinx/meta-xilinx}}. \vspace{1em}
+
+\textbf{Wiki Xilinx}
+
+\framebox{\url{http://www.wiki.xilinx.com/Prepare+Boot+Image}}.\vspace{1em}
+
+\textbf{Yocto tutorials}
+
+\framebox{\url{http://wiki.elphel.com/index.php?title=Yocto_tests}}.
+\vspace{1em}
+
+\framebox{\url{http://git.yoctoproject.org/cgit/cgit.cgi/meta-xilinx/tree/README}}.
+
+\vspace{1em}
+
+\texttt{\framebox{yocto/meta-xilinx/docs/BOOT.sdcard}} (This directory can be found on meta-xilinx git)
+
+
+Yocto provides tools and metadata for creating custom embedded systems with following main features :
+\begin{itemize}
+\item Images are tailored to specific hardware and use cases
+\item But metadata is generally arch-independent
+\item Unlike a distro, 'kitchen sink' is not included (we know what we need in advance)
+\end{itemize}
+
+Other keywords and their meaning is explained here.
+\begin{itemize}
+\item An image is a collection of 'baked' recipes (packages)
+\item A 'recipe' is a set of instructions for building 'packages'
+\begin{itemize}[label=$\star$]
+\item Where to get the source and which patches to apply
+\item Dependencies (on libraries or other recipes, for example)
+\item Config/compile options, 'install' customization
+\end{itemize}
+\item A 'layer' is a logical collection of recipes representing the core, a board support package (BSP), or an application stack
+\end{itemize}
+
+%===================================================%
+\section{Download sources from git repositories}
+%===================================================%
+
+Jethro is the last branch of git repositories.
+
+Download Yocto meta layer:
+
+\framebox{\texttt{git clone -b jethro git://git.yoctoproject.org/poky.git}}.
+
+Download Xilinx meta layer:
+
+\framebox{\texttt{git clone -b jethro git://github.com/Xilinx/meta-xilinx}}.
+
+Download meta-openembedded layer:
+
+\framebox{\texttt{git clone -b jethro git://github.com/openembedded/meta-openembedded}}.
+
+Download openembedded-core :
+
+\framebox{\texttt{git clone -b jethro git://github.com/openembedded/openembedded-core}}.
+
+
+
+%===================================================%
+\section{Build configuration}
+%===================================================%
+
+Once the packages are cloned, we can start modifying it.
+Initialize a build using the 'oe-init-build-env' script in Poky.
+\begin{lstlisting}[language=bash]
+$ source oe-init-build-env
+\end{lstlisting}
+
+Once initialized configure bblayers.conf by adding the 'meta-xilinx' and meta-openembedded layers.
+\texttt{
+	BBLAYERS ?= " \
+		<path to layer>/openembedded-core/meta \ \\
+		<path to layer>/meta-xilinx \ \\
+	    <path to layer>/meta-openembedded/meta-oe \ \\
+		"
+} 
+
+To build a specific target BSP configure the associated machine in local.conf:
+\texttt{
+	MACHINE ?= "zedboard-zynq7"
+}
+
+Change 	\texttt{PACKAGE\_CLASSES '= "package\_rpm"} by
+
+\texttt{PACKAGE\_CLASSES '= "package\_deb"}. Then, add the following lines :
+
+\texttt{
+IMAGE\_FEATURES += "package-management"
+BB\_NUMBER\_THREADS = "nb" \\
+PARALLEL\_MAKE = "-j nb"\\
+DISTRO\_HOSTNAME = "zynq"\\
+}
+where nb = 2 x number of cores \\
+
+
+Build the target file system image using bitbake:
+\begin{lstlisting}[language=bash]
+	$ bitbake core-image-minimal
+\end{lstlisting}
+Once complete the images for the target machine will be available in the output directory \framebox{\texttt{poky/build/tmp/deploy/images/}}.
+
+
+\section{Xilinx SDK installation}
+
+\begin{lstlisting}[language=bash]
+$ sudo apt-get install ia32-libs
+$ export CROSS\_COMPILE=arm-xilinx-linux-gnueabi-
+$ source <Xilinx Tools installation directory>/ISE\_DS/settings64.sh
+\end{lstlisting}
+

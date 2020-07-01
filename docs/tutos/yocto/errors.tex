@@ -1,0 +1,32 @@
+\chapter{Error Messages and common problems}
+\label{chap:error}
+\section{Encrypted file system}
+\subsection{Problem}
+If you have installed your operating system on an encrypted filesystem and tried to use Yocto on it, you will not be able to compile and those warning message will apear :
+\begin{itemize}
+	\item Failed to create a file with a long name in TMPDIR. Please use a filesystem that does not unreasonably limit filename length.
+	\item Failed to create a file with a long name in SSTATE\_DIR. Please use a filesystem that does not unreasonably limit filename length.
+\end{itemize}
+\subsection{Solution}
+Reasonnable solutions are (do not forget to update paths into your bblayers.conf) :
+\begin{itemize}
+\item Moving all Yocto directories and files into a non-encrypted partition.
+\begin{lstlisting}[language=bash]
+mv Yocto /PathToNonEncryptedPartition/Yocto
+\end{lstlisting}
+\item Create a non-encrypted partition and mounted it on /media/yocto, then create directories sstate-cache and tmp into it. 
+\begin{lstlisting}[language=bash]
+cd /media/yocto
+mkdir tmp sstate-cache 
+\end{lstlisting}
+Open your local.conf file into your project folder within the encrypted-partition.
+\begin{lstlisting}[language=bash]
+emacs /home/user/Yocto/poky/build/conf/local.conf
+\end{lstlisting}
+and modify those lines: 
+\begin{lstlisting}[language=bash]
+TMPDIR = "/media/yocto/tmp"
+SSTATE_DIR ?= "/media/yocto/sstate-cache"
+\end{lstlisting}
+
+\end{itemize}

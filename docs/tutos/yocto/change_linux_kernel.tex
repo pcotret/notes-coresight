@@ -1,0 +1,11 @@
+\chapter{Changing Linux kernel version}
+\label{chap:kernel_version}
+The first thing needed in order to change the kernel version is the recipee. The recipee is located under \framebox{\texttt{meta-xilinx/recipes-kernel/linux}}.
+
+Once the recipe is spotted for the required version, the following steps needs to be taken.
+\begin{enumerate}
+\item Change the configuration in the following file:\\ \framebox{\texttt{/yocto/meta-xilinx/conf/machine/include/machine-xilinx-default.inc}} \vspace{8pt} by modifying the PREFFERED\_VERSION\_linux-xlnx by the required version.
+\item Go to poky folder and run the command : \framebox{\texttt{source oe-init-build-env}}.
+\item Now, you should be in the build folder. Here you can launch your command to genereate the wanted type of core-image. We will run the following command here : \\ \framebox{\texttt{bitbake core-image-minimal}}.
+\item The genereated files are located at : \framebox{\texttt{poky/build/tmp/deploy/images/zedboard-zynq7/}}.
+\end{enumerate}

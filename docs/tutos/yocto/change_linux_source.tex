@@ -1,0 +1,118 @@
+\chapter{Linux Kernel configuration and modifications}
+\label{chap:kernel_modifications}
+This chapter contains information on kernel configuration and kernel modifications.
+\section{Configuration}
+The current Kernel version used is 4.4. The configuration of the kernel used can be found in \framebox{\textbf{redaction\_hw git\textbackslash work\textbackslash kernel\_modifications\textbackslash current\_kernel\_configuration.config}}.
+
+
+\section{Kernel source modification (CS Components)}
+The linux kernel sources used by yocto can be found under the following directory.\\ \framebox{poky/build/tmp/work/zedboard\_zynq7-poky-linux-gnueabi/linux-xlnx/} \newline 
+\framebox{4.4-xilinx+gitAUTOINC+89cc643aff-r0/linux-zedboard\_zynq7-standard-build/source}.
+\vspace{1em}
+
+The files located here can be modified. Then, the kernel need to be compiled using the command \framebox{\textbf{bitbake linux-xlnx -c compile -f}}. In order to obtain rootfs image, the command \framebox{\textbf{bitbake linux-xlnx -c deploy}} must be executed. The image file can be found under \framebox{poky/build/tmp/deploy/images/zedboard-zynq7}.
+
+\vspace{1em}
+\subsection{Generate a patch file}
+To generate a patch file for multiple modified files, the following command is used. 
+\begin{lstlisting}[language=bash]
+diff -u "original_folder" "modified_folder"
+\end{lstlisting}
+
+The modifications to the Coresight driver are available to patch located in \\ \textbf{redaction\_hw\textbackslash work\textbackslash kernel\_modifications\textbackslash modification\_coresight\_driver.patch}.
+
+\subsection{Applying the patch}
+\vspace{1em}
+To apply the patch, copy the patch in linux kernel source directory under \\ \textbf{kernel\_source/drivers/hw\_tracing/coresight/} and run the following command : 
+
+\begin{lstlisting}[language=bash]
+patch -p6  < modification_coresight_driver.patch
+\end{lstlisting}
+
+\section{Custom patch for kernel with YOCTO}
+
+\subsection{Patch generation}
+\begin{itemize}
+	\item Change directory to the location where kernel sources are located
+\begin{lstlisting}[language=bash]
+cd ~/HardBlare/Yocto/poky-hardblare/build/tmp/work-shared/zedboard-hardblare/kernel-source
+
+	\item  Move to Coresight directory
+\begin{lstlisting}[language=bash]
+cd drivers/hwtracing/coresight
+\end{lstlisting}
+	\item  Make a backup 
+	\item  Change the files as required
+	\item  Add the changes to git 
+\begin{lstlisting}[language=bash]
+git add *
+\end{lstlisting}
+	\item  Commit the changes to git and verify git log
+\begin{lstlisting}[language=bash]
+git commit -m "changes ..."
+git log --pretty=oneline
+\end{lstlisting}
+	\item  Generate the patch
+\begin{lstlisting}[language=bash]
+git format-patch -1
+\end{lstlisting}
+\end{itemize}
+
+\subsection{Kernel recipe modification}
+\begin{itemize}
+	\item  Copy the generated patch to kernel recipes 
+\begin{lstlisting}[language=bash]
+cp 0001.patch ~/HardBlare/Yocto/meta-hardblare/recipes-kernel/linux/linux-yocto-hardblare/name_of_patch.patch
+\end{lstlisting}
+	\item  Add a .bbappend file to modify the recipe without touching to the .bb file ! 
+\begin{lstlisting}[language=bash]
+cd ~/HardBlare/Yocto/meta-hardblare/recipes-kernel/linux
+vim linux-yocto-hardblare.bbappend 
+\end{lstlisting}
+	\item  Add these two lines in .bbappend file **(Make sure to edit the PV variable to keep track of version number i.e. if a change is made to the patch, make sure to increment this variable (r1, r2, r3, ...) as required to keep track of different builds)**
+\begin{lstlisting}[language=bash]
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
+SRC_URI +="file://coresight.patch"
+\end{lstlisting}
+	\item  As usual, use bitbake to generate kernel images
+\begin{lstlisting}[language=bash]
+bitbake linux-yocto-hardblare -c compile -f 
+bitbake linux-yocto-hardblare -c deploy 
+\end{lstlisting}
+\end{itemize}
+
+
+\section{Building custom kernel modules with Yocto}
+
+To build a custom Linux Kernel module with Yocto, we will need to write a recipe. This recipe use the Kernel sources fetched by Yocto during Linux image generation. A custom kernel module and its recipe is available in poky repository in the directory `meta-skeleton/recipers-kernel/hello-mod`
+
+\begin{itemize}
+	\item Create a folder and files using the following commands:
+\begin{lstlisting}[language=bash]
+cd ~/HardBlare/Yocto/poky-hardblare/recipes-kernel
+mkdir custom-mod
+cd custom-mod
+touch custom-mod.bb
+mkdir files
+touch files/COPYING files/hello.c files/Makefile
+\end{lstlisting}
+	\item The custom-mod folder contains the recipe and a folder files which contains the code source of LKM, Makefile and a COPYING file which contains the licence. 
+	\item The Makefile and COPYING files can be copied directly from the provided example. 
+	\item The COPYING file's md5 hash is used in the recipe file. 
+	\item Once the source code is modified, the following commands can be run : 
+\begin{lstlisting}[language=bash]
+bitbake custom-mod
+\end{lstlisting}
+OR 
+\begin{lstlisting}[language=bash]
+bitbake custom-mod -c compile
+bitbake custom-mod -c build
+\end{lstlisting}
+
+\item \textbf{Make sure to load the right bitstream !!!}
+\end{itemize}
+
+In our case, our driver creates a SYSFS entry that appears on the Zedboard under the directory `/sys/bus/platform/drivers/custom-mod`. In this directory, there must be two files `store` and `read`. These files can be used to write or to read the custom IP registers respectively. For now, the registers do not contain any particular order but it will be done alongside development of different IPs. 
+
+
+

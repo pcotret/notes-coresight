@@ -1,0 +1,90 @@
+%===================================================%
+%===================================================%
+\chapter{Bootloader}
+%===================================================%
+%===================================================%
+
+%===================================================%
+\section{Download sources}
+%===================================================%
+Source:\\
+\framebox{\url{http://www.wiki.xilinx.com/Fetch+Sources}}\vspace{1em}
+
+\framebox{\url{git clone git://github.com/Xilinx/u-boot-xlnx.git}}\vspace{1em}
+
+The description of the previously downloaded git repositories can be found in the table \ref{tab:git}.
+
+\begin{table}
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Repository Name} & \textbf{Content}\\
+\midrule
+linux-xlnx.git & The Linux kernel with Xilinx patches and drivers\\
+u-boot-xlnx.git & The u-boot bootloader with Xilinx patches and drivers\\
+device-tree.git & Device Tree generator plugin for xsdk\\
+\bottomrule
+\end{tabular}
+\caption{Description of different downloaded sources from git}
+\label{tab:git}
+\end{table}
+
+\begin{lstlisting}[language=bash]
+$ sudo ln -s /usr/bin/make /usr/bin/gmake
+\end{lstlisting}
+
+%===================================================%
+\section{Use Vivado to create HW description file (hdf)}
+%===================================================%
+
+Download Xilinx Vivado (licence needed to activate and use) :\\
+\framebox{\url{http://www.xilinx.com/support/download.html}}\\ \vspace{5pt}
+
+Follow the tutorial on the following link to generate a .hdf file.\vspace{.8em}
+
+\framebox{\url{http://zedboard.org/zh-hant/node/1454}}\\
+
+%===================================================%
+\section{FSBL creation}
+%===================================================%
+Source:\\
+\framebox{\url{www.wiki.xilinx.com/Build+FSBL}}\\ \vspace{5pt}
+
+\begin{lstlisting}[language=bash]
+$ source /opt/Xilinx/SDK/2014.4/settings64.sh
+\end{lstlisting}
+
+Use hsi included in Vivado (you may have to source settings64.sh or settings32.sh)\\
+
+\begin{lstlisting}[language=bash]
+$ hsi
+****** hsi v2014.4 (64-bit)
+**** SW Build 1071353 on Tue Nov 18 16:48:31 MST 2014
+** Copyright 1986-2014 Xilinx, Inc. All Rights Reserved.
+
+hsi% set hwdsgn [open_hw_design <your_hfd_file>]
+
+hsi% generate_app -hw $hwdsgn -os standalone -proc ps7_cortexa9_0 -app zynq_fsbl -compile -sw fsbl -dir <directory_for_new_app>
+\end{lstlisting}
+
+
+%===================================================%
+\section{U-boot}
+%===================================================%
+Sources:\\
+\framebox{\url{http://www.wiki.xilinx.com/Build+U-Boot}}.\\
+
+Got to the 'u-boot-xlnx' directory \\
+
+\begin{lstlisting}[language=bash]
+$ sudo apt-get install libssl-dev
+\end{lstlisting}
+
+
+\begin{lstlisting}[language=bash]
+$ export CROSS_COMPILE=arm-xilinx-linux-gnueabi-
+$ make zynq_zed_config
+$ make
+$ cd tools
+$ export PATH=`pwd`:$PATH
+\end{lstlisting}
