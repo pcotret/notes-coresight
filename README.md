@@ -24,3 +24,18 @@ Le fichier `patches.md` contient le diff des patchs qui ont été utilisés pour
 - `arch/arm/boot/dts/zynq-7000.dtsi`: l'ajout des différents composants Coresight.
 - `drivers/hwtracing/coresight/coresight-tpiu.c`: l'ajout des registres du TPIU.
 
+## Manipulation
+
+Même après les manipulations logicielles détaillées dans le blogpost https://pcotret.github.io/coresight-zedboard/, on en reste au même point...
+
+D'après une doc cachée au fond d'un dépôt :
+
+>To activate coresight components in the Zynq under vivado processing system IP, activate trace by choosing a trace width and deciding where to connect these traces (either to EMIO or MIO). If the connection is made to EMIO (Figure 3.14), it is a wire available to the PL part of ZYNQ and if the connection is made to MIO, it is available to the output ports and can be used and analysed by logic analyzers. A clock is needed by TPIU that allows to synchronize TPIU with trace analyzer. By looking at ARM Coresight Component User guide, two frequencies can be choosed (Figure 2.6).
+>1. @250 MHz : data should be received only at front end.
+>2. @125 MHz : data should be received at both ends. The frequency of 250 MHz was chosen because working with dual edge is not easy and it is not adapted to Zynq FPGA. Dual edge clock can be used in CPLD’s (like Xilinx’s CoolRunner II which offers the possibility of using dual edge FF’s).
+
+![p1](./img/zynq_trace_clk.png)
+
+![p1](./img/zynq_trace_tpiu.png)
+
+L'idée serait dans un premier temps de tester cette manipulation, de regénérer un `boot.bin` avec `bootgen` et surtout de retrouver la documentation Coresight où cette information d'activation du TPIU apparait...
