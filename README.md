@@ -39,3 +39,11 @@ D'après une doc cachée au fond d'un dépôt :
 ![p1](./img/zynq_trace_tpiu.png)
 
 L'idée serait dans un premier temps de tester cette manipulation, de regénérer un `boot.bin` avec `bootgen` et surtout de retrouver la documentation Coresight où cette information d'activation du TPIU apparait...
+
+Hum, je retrouve le même genre d'info dans le doc Lauterbach https://www2.lauterbach.com/pdf/app_xilinx_zynq.pdf
+
+## Documents Coresight de référence
+
+- CoreSight Components Technical Reference Manual https://developer.arm.com/documentation/ddi0314/h
+- ARM CoreSight SoC-400 Technical Reference Manual https://developer.arm.com/documentation/ddi0480/g/?lang=en
+
