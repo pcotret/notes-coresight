@@ -50,6 +50,7 @@ Hum, je retrouve le même genre d'info dans le doc Lauterbach https://www2.laute
 [2] CoreSight Program Flow Trace Architecture Specification PFTv1.0 and PFTv1.1: https://developer.arm.com/documentation/ihi0035/b
 ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition: https://developer.arm.com/documentation/ddi0406/cd
 [4] CoreSight Components Technical Reference Manual: https://developer.arm.com/documentation/ddi0314/h
+https://developer.arm.com/documentation/ihi0014/q
 
 ## Dépôts de référence
 - https://github.com/ARM-software/CSAL
