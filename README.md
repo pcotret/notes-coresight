@@ -46,4 +46,14 @@ Hum, je retrouve le même genre d'info dans le doc Lauterbach https://www2.laute
 
 - CoreSight Components Technical Reference Manual https://developer.arm.com/documentation/ddi0314/h
 - ARM CoreSight SoC-400 Technical Reference Manual https://developer.arm.com/documentation/ddi0480/g/?lang=en
+[1] CoreSight PTM-A9 Technical Reference Manual: https://developer.arm.com/documentation/ddi0401/c
+[2] CoreSight Program Flow Trace Architecture Specification PFTv1.0 and PFTv1.1: https://developer.arm.com/documentation/ihi0035/b
+ARM Architecture Reference Manual ARMv7-A and ARMv7-R edition: https://developer.arm.com/documentation/ddi0406/cd
+[4] CoreSight Components Technical Reference Manual: https://developer.arm.com/documentation/ddi0314/h
+
+## Dépôts de référence
+- https://github.com/ARM-software/CSAL
+- https://github.com/Linaro/OpenCSD
+- https://github.com/hwangcc23/ptm2human
+
 
